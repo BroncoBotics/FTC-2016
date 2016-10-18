@@ -92,7 +92,7 @@ public class AutonomousOpMode extends LinearOpMode {
     ColorSensor colorSensor;
 
     @Override
-    public void runOpMode() throws InterruptedException {}
+    public void runOpMode() {}
 
     public void encoderInit() {
         leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -118,7 +118,7 @@ public class AutonomousOpMode extends LinearOpMode {
      */
     public void encoder(double leftSpeed, double rightSpeed,
                         double leftInches, double rightInches,
-                        double timeoutS) throws InterruptedException {
+                        double timeoutS) {
         int leftTarget;
         int rightTarget;
 
@@ -173,11 +173,11 @@ public class AutonomousOpMode extends LinearOpMode {
         }
     }
 
-    public void encoderDriveStraight(double speed, double distance, double timeoutS) throws InterruptedException {
+    public void encoderDriveStraight(double speed, double distance, double timeoutS) {
         encoder(speed, speed, distance, distance, timeoutS);
     }
 
-    public void encoderTurn(double speed, double degrees, double timeoutS) throws InterruptedException {
+    public void encoderTurn(double speed, double degrees, double timeoutS) {
         final double ROTATION_k = 0.01333; //Inches per degree
         double leftSpeed = (degrees > 0) ? speed : -speed;
         double rightSpeed = (degrees > 0) ? -speed : speed;
@@ -187,7 +187,7 @@ public class AutonomousOpMode extends LinearOpMode {
         encoder(leftSpeed, rightSpeed, distance, distance, timeoutS);
     }
 
-    public void driveToLine(double speed, double timeoutS) throws InterruptedException {
+    public void driveToLine(double speed, double timeoutS) {
 
         // get a reference to our Light Sensor object.             // Primary LEGO Light Sensor
         //  lightSensor = hardwareMap.opticalDistanceSensor.get("sensor_ods");  // Alternative MR ODS sensor.
@@ -221,7 +221,7 @@ public class AutonomousOpMode extends LinearOpMode {
         RIGHT_FAVORING, LEFT_FAVORING
     }
 
-    public void followLine(double base_speed, double distanceInch, Turn turn_favorite, double timeoutS) throws InterruptedException {
+    public void followLine(double base_speed, double distanceInch, Turn turn_favorite, double timeoutS) {
 
         // turn on LED of light sensor.
         lightSensor.enableLed(true);

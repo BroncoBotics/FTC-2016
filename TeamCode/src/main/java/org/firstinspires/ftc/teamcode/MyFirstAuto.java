@@ -11,7 +11,7 @@ public class MyFirstAuto extends AutonomousModeTest {
 
 
     @Override
-    public void runOpMode() throws InterruptedException {
+    public void runOpMode() {
 
         encoderInit();
         // Wait for the game to start (driver presses PLAY)

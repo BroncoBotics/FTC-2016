@@ -17,7 +17,7 @@ public class AutonomousModeTest extends AutonomousOpMode {
     static final double     TURN_SPEED              = 0.5;
 
     @Override
-    public void runOpMode() throws InterruptedException {
+    public void runOpMode() {
 
         encoderInit();
 
