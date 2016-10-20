@@ -75,14 +75,14 @@ public class AutonomousOpMode extends LinearOpMode {
     /* Declare OpMode members. */
     private ElapsedTime     runtime = new ElapsedTime();
 
-    static final double     COUNTS_PER_MOTOR_REV    = 1120 ;    // eg: TETRIX Motor Encoder
-    static final double     DRIVE_GEAR_REDUCTION    = 1.0 ;     // This is < 1.0 if geared UP
-    static final double     WHEEL_DIAMETER_INCHES   = 4.0 ;     // For figuring circumference
-    static final double     COUNTS_PER_INCH         = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
+    static double     COUNTS_PER_MOTOR_REV    = 1120 ;    // eg: TETRIX Motor Encoder
+    static double     DRIVE_GEAR_REDUCTION    = 1.0 ;     // This is < 1.0 if geared UP
+    static double     WHEEL_DIAMETER_INCHES   = 3.975 ;     // For figuring circumference
+    static double     COUNTS_PER_INCH         = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
                                                       (WHEEL_DIAMETER_INCHES * 3.1415);
-    static final double     WHITE_THRESHOLD         = 0.2;
-    static final double     BLACK_THRESHOLD         = 0.1;
-    static final double     HEADING_CORRECTION_SPEED         = 0.2;
+    static double     WHITE_THRESHOLD         = 0.25;
+    static double     BLACK_THRESHOLD         = 0.1;
+    static double     HEADING_CORRECTION_SPEED         = 0.3;
 
 
     DcMotor leftMotor, rightMotor;
@@ -91,10 +91,23 @@ public class AutonomousOpMode extends LinearOpMode {
     ModernRoboticsI2cRangeSensor rangeSensor;
     ColorSensor colorSensor;
 
+
     @Override
     public void runOpMode() {}
 
-    public void encoderInit() {
+    public void hardwareInit() {
+        rangeSensor = hardwareMap.get(ModernRoboticsI2cRangeSensor.class, "rangesensor");
+        lightSensor = hardwareMap.opticalDistanceSensor.get("opticaldistance");
+
+        colorSensor = hardwareMap.colorSensor.get("colorsensor");
+        colorSensor.enableLed(false);
+
+        leftMotor = hardwareMap.dcMotor.get("left motor");
+        rightMotor = hardwareMap.dcMotor.get("right motor");
+
+        leftMotor.setDirection(DcMotor.Direction.REVERSE); // Set to REVERSE if using AndyMark motors
+        rightMotor.setDirection(DcMotor.Direction.FORWARD);
+
         leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
@@ -148,9 +161,13 @@ public class AutonomousOpMode extends LinearOpMode {
 
                 if (Math.abs(leftMotor.getCurrentPosition()) >= leftTarget) {
                     leftMotor.setPower(0);
+                } else {
+                    leftMotor.setPower(leftSpeed);
                 }
                 if (Math.abs(rightMotor.getCurrentPosition()) >= rightTarget) {
                     rightMotor.setPower(0);
+                } else {
+                    rightMotor.setPower(rightSpeed);
                 }
 
                 // Display it for the driver.
@@ -178,7 +195,7 @@ public class AutonomousOpMode extends LinearOpMode {
     }
 
     public void encoderTurn(double speed, double degrees, double timeoutS) {
-        final double ROTATION_k = 0.01333; //Inches per degree
+        double ROTATION_k = 0.1875; //Inches per degree
         double leftSpeed = (degrees > 0) ? speed : -speed;
         double rightSpeed = (degrees > 0) ? -speed : speed;
 
@@ -189,20 +206,13 @@ public class AutonomousOpMode extends LinearOpMode {
 
     public void driveToLine(double speed, double timeoutS) {
 
-        // get a reference to our Light Sensor object.             // Primary LEGO Light Sensor
-        //  lightSensor = hardwareMap.opticalDistanceSensor.get("sensor_ods");  // Alternative MR ODS sensor.
-
-        // turn on LED of light sensor.
-        lightSensor.enableLed(true);
-
         runtime.reset();
 
-        // Start the robot moving forward, and then begin looking for a white line.
-        leftMotor.setPower(speed);
-        rightMotor.setPower(speed);
-
-
         while ((lightSensor.getLightDetected() < WHITE_THRESHOLD) && runtime.seconds() < timeoutS) {
+
+            // Start the robot moving forward, and then begin looking for a white line.
+            leftMotor.setPower(speed);
+            rightMotor.setPower(speed);
 
             telemetry.addData("Light Level", lightSensor.getLightDetected());
             telemetry.update();
@@ -221,7 +231,7 @@ public class AutonomousOpMode extends LinearOpMode {
         RIGHT_FAVORING, LEFT_FAVORING
     }
 
-    public void followLine(double base_speed, double distanceInch, Turn turn_favorite, double timeoutS) {
+    public void followLineOld(double base_speed, double distanceInch, Turn turn_favorite, double timeoutS) {
 
         // turn on LED of light sensor.
         lightSensor.enableLed(true);
@@ -234,11 +244,14 @@ public class AutonomousOpMode extends LinearOpMode {
 
         runtime.reset();
 
+        encoderDriveStraight(.01, 5, 3);
+
         while (rangeSensor.getDistance(DistanceUnit.INCH) > distanceInch && runtime.seconds() < timeoutS) {
 
             double light_intensity = lightSensor.getLightDetected();
             telemetry.addData("Light Level", light_intensity);
             telemetry.update();
+
 
             if (light_intensity > WHITE_THRESHOLD) {
                 //Sees white line
@@ -263,11 +276,64 @@ public class AutonomousOpMode extends LinearOpMode {
 
     }
 
+    enum followState {
+        FORWARD, FOLLOW
+    }
+
+    public void followLine(double base_speed, double distanceInch, Turn turn_favorite, double stateSwitchTime, double timeoutS) {
+        // turn on LED of light sensor.
+        lightSensor.enableLed(true);
+
+        followState state = followState.FORWARD;
+
+        double correction;
+
+        if (turn_favorite == Turn.RIGHT_FAVORING) {
+            correction = HEADING_CORRECTION_SPEED;
+        } else {
+            correction = -HEADING_CORRECTION_SPEED;
+        }
+
+        runtime.reset();
+
+        ElapsedTime stateTimer = new ElapsedTime();
+
+        while (rangeSensor.getDistance(DistanceUnit.INCH) > distanceInch && runtime.seconds() < timeoutS) {
+            double light_intensity = lightSensor.getLightDetected();
+            telemetry.addData("Light Level", light_intensity);
+            telemetry.update();
+
+            if (stateTimer.seconds() >= stateSwitchTime) {
+                if (state == followState.FORWARD) {
+                    state = followState.FOLLOW;
+                } else {
+                    state = followState.FORWARD;
+                }
+                stateTimer.reset();
+            }
+
+            if (state == followState.FORWARD) {
+                leftMotor.setPower(base_speed);
+                rightMotor.setPower(base_speed);
+            } else if (light_intensity > WHITE_THRESHOLD) {
+                //Sees white line
+                leftMotor.setPower(base_speed - correction);
+                rightMotor.setPower(base_speed + correction);
+            } else {
+                leftMotor.setPower(base_speed + correction);
+                rightMotor.setPower(base_speed - correction);
+            }
+        }
+    }
+
+
+
     public enum Color {
         RED, BLUE
     }
 
     public Color identifyColor() {
+
         if (colorSensor.blue() > colorSensor.red())
             return Color.BLUE;
         else
