@@ -34,6 +34,7 @@ package org.firstinspires.ftc.teamcode.codelib;
 
 import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cRangeSensor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.LightSensor;
@@ -89,6 +90,8 @@ public class AutonomousOpMode extends LinearOpMode {
     ColorSensor colorSensor;
 
 
+
+
     @Override
     public void runOpMode() {}
 
@@ -98,6 +101,8 @@ public class AutonomousOpMode extends LinearOpMode {
 
         colorSensor = hardwareMap.colorSensor.get("colorsensor");
         colorSensor.enableLed(false);
+
+
 
         leftMotor = hardwareMap.dcMotor.get("left motor");
         rightMotor = hardwareMap.dcMotor.get("right motor");

@@ -34,6 +34,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -64,6 +65,8 @@ public class Teleop extends OpMode
     // private DcMotor leftMotor = null;
     // private DcMotor rightMotor = null;
 
+    AnalogInput limitSwitch;
+
     Drivetrain drive;
     private DcMotor lifts, sucker;
     boolean slowMode = false, hasDriveCheckRunOnce = false, suckerOn = false, hasSuckerCheckRunOnce = false;
@@ -76,6 +79,7 @@ public class Teleop extends OpMode
     public void init() {
         drive = new Drivetrain(hardwareMap.dcMotor.get("left motor"), hardwareMap.dcMotor.get("right motor"));
 
+        limitSwitch = hardwareMap.analogInput.get("limitSwitch");
 
         //motors
         lifts = hardwareMap.dcMotor.get("lifts");
@@ -131,7 +135,11 @@ public class Teleop extends OpMode
 
         sucker.setPower((suckerOn) ? 1.0 : 0.0);
 
-        lifts.setPower(gamepad1.right_trigger - gamepad1.left_trigger);
+        if (!limitSwitched()) {
+            lifts.setPower(gamepad1.right_trigger - gamepad1.left_trigger);
+        } else {
+            lifts.setPower(0);
+        }
     }
 
     /*
@@ -142,6 +150,10 @@ public class Teleop extends OpMode
         drive.stop();
         sucker.setPower(0);
         lifts.setPower(0);
+    }
+
+    private Boolean limitSwitched(){
+        return limitSwitch.getVoltage() > (.1 * limitSwitch.getMaxVoltage());
     }
 
 }
