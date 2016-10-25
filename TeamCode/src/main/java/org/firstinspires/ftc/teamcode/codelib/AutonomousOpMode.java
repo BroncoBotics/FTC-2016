@@ -80,9 +80,6 @@ public class AutonomousOpMode extends LinearOpMode {
     static double     WHEEL_DIAMETER_INCHES   = 3.975 ;     // For figuring circumference
     static double     COUNTS_PER_INCH         = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
                                                       (WHEEL_DIAMETER_INCHES * 3.1415);
-    static double     WHITE_THRESHOLD         = 0.25;
-    static double     BLACK_THRESHOLD         = 0.1;
-    static double     HEADING_CORRECTION_SPEED         = 0.3;
 
 
     DcMotor leftMotor, rightMotor;
@@ -111,8 +108,8 @@ public class AutonomousOpMode extends LinearOpMode {
         leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         // Send telemetry message to indicate successful Encoder reset
         telemetry.addData("Path0",  "Starting at %7d :%7d",
@@ -141,8 +138,8 @@ public class AutonomousOpMode extends LinearOpMode {
             rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-            leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            leftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            rightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
             // Determine new target position, and pass to motor controller
             leftTarget = (int)(Math.abs(leftInches) * COUNTS_PER_INCH);
@@ -206,6 +203,8 @@ public class AutonomousOpMode extends LinearOpMode {
 
     public void driveToLine(double speed, double timeoutS) {
 
+        double WHITE_THRESHOLD         = 0.25;
+
         runtime.reset();
 
         while ((lightSensor.getLightDetected() < WHITE_THRESHOLD) && runtime.seconds() < timeoutS) {
@@ -231,20 +230,16 @@ public class AutonomousOpMode extends LinearOpMode {
         RIGHT_FAVORING, LEFT_FAVORING
     }
 
-    public void followLineOld(double base_speed, double distanceInch, Turn turn_favorite, double timeoutS) {
+    public void followLine(double base_speed, double distanceInch, Turn turn_favorite, double timeoutS) {
+
+        double     HEADING_CORRECTION_SPEED         = 0.4;
+        double     WHITE_THRESHOLD                  = 0.25;
 
         // turn on LED of light sensor.
         lightSensor.enableLed(true);
 
-        if (turn_favorite == Turn.RIGHT_FAVORING) {
-            double correction = HEADING_CORRECTION_SPEED;
-        } else {
-            double correction = -HEADING_CORRECTION_SPEED;
-        }
-
         runtime.reset();
 
-        encoderDriveStraight(.01, 5, 3);
 
         while (rangeSensor.getDistance(DistanceUnit.INCH) > distanceInch && runtime.seconds() < timeoutS) {
 
@@ -252,20 +247,25 @@ public class AutonomousOpMode extends LinearOpMode {
             telemetry.addData("Light Level", light_intensity);
             telemetry.update();
 
+            if (turn_favorite == Turn.LEFT_FAVORING) {
+                HEADING_CORRECTION_SPEED = -HEADING_CORRECTION_SPEED;
+            }
+
 
             if (light_intensity > WHITE_THRESHOLD) {
                 //Sees white line
-                leftMotor.setPower(base_speed - HEADING_CORRECTION_SPEED);
-                rightMotor.setPower(base_speed + HEADING_CORRECTION_SPEED);
-            } else if (light_intensity < BLACK_THRESHOLD) {
-                //Sees black tile
-                leftMotor.setPower(base_speed + HEADING_CORRECTION_SPEED);
-                rightMotor.setPower(base_speed - HEADING_CORRECTION_SPEED);
-            } else {
-                //In the middle
                 leftMotor.setPower(base_speed);
                 rightMotor.setPower(base_speed);
+                encoderDriveStraight(.3, 2, 3);
+            } else  {
+                //Sees black tile
+                leftMotor.setPower(HEADING_CORRECTION_SPEED);
+                rightMotor.setPower(-HEADING_CORRECTION_SPEED);
             }
+
+            telemetry.addData("RightMotor", rightMotor.getPower());
+            telemetry.addData("LeftMotor", leftMotor.getPower());
+            telemetry.update();
 
             idle();
         }
@@ -274,56 +274,6 @@ public class AutonomousOpMode extends LinearOpMode {
         leftMotor.setPower(0);
         rightMotor.setPower(0);
 
-    }
-
-    enum followState {
-        FORWARD, FOLLOW
-    }
-
-    public void followLine(double base_speed, double distanceInch, Turn turn_favorite, double stateSwitchTime, double timeoutS) {
-        // turn on LED of light sensor.
-        lightSensor.enableLed(true);
-
-        followState state = followState.FORWARD;
-
-        double correction;
-
-        if (turn_favorite == Turn.RIGHT_FAVORING) {
-            correction = HEADING_CORRECTION_SPEED;
-        } else {
-            correction = -HEADING_CORRECTION_SPEED;
-        }
-
-        runtime.reset();
-
-        ElapsedTime stateTimer = new ElapsedTime();
-
-        while (rangeSensor.getDistance(DistanceUnit.INCH) > distanceInch && runtime.seconds() < timeoutS) {
-            double light_intensity = lightSensor.getLightDetected();
-            telemetry.addData("Light Level", light_intensity);
-            telemetry.update();
-
-            if (stateTimer.seconds() >= stateSwitchTime) {
-                if (state == followState.FORWARD) {
-                    state = followState.FOLLOW;
-                } else {
-                    state = followState.FORWARD;
-                }
-                stateTimer.reset();
-            }
-
-            if (state == followState.FORWARD) {
-                leftMotor.setPower(base_speed);
-                rightMotor.setPower(base_speed);
-            } else if (light_intensity > WHITE_THRESHOLD) {
-                //Sees white line
-                leftMotor.setPower(base_speed - correction);
-                rightMotor.setPower(base_speed + correction);
-            } else {
-                leftMotor.setPower(base_speed + correction);
-                rightMotor.setPower(base_speed - correction);
-            }
-        }
     }
 
 

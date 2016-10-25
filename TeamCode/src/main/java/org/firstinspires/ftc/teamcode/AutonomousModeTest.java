@@ -23,9 +23,11 @@ public class AutonomousModeTest extends AutonomousOpMode {
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
 
+
+
         // Step through each leg of the path,
         // Note: Reverse movement is obtained by setting a negative distance (not speed)
-        encoderDriveStraight(DRIVE_SPEED, 20, 10.0);  // S1: Forward 47 Inches with 5 Sec timeout
+        // S1: Forward 47 Inches with 5 Sec timeout
        // encoderTurn(1, 90, 5.0);  // S2: Turn Right 12 Inches with 4 Sec timeout
 //        encoder(DRIVE_SPEED, -24, -24, 4.0);  // S3: Reverse 24 Inches with 4 Sec timeout
 //
