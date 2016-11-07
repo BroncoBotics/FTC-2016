@@ -159,18 +159,18 @@ public class AutonomousOpMode extends LinearOpMode {
             // keep looping while we are still active, and there is time left, and both motors are running.
             while (opModeIsActive() &&
                    (runtime.seconds() < timeoutS) &&
-                   (Math.abs(leftMotor.getCurrentPosition()) < leftTarget  || Math.abs(rightMotor.getCurrentPosition()) < rightTarget)) {
+                   (Math.abs(leftMotor.getCurrentPosition()) < leftTarget  && Math.abs(rightMotor.getCurrentPosition()) < rightTarget)) {
 
-                if (Math.abs(leftMotor.getCurrentPosition()) >= leftTarget) {
-                    leftMotor.setPower(0);
-                } else {
-                    leftMotor.setPower(leftSpeed);
-                }
-                if (Math.abs(rightMotor.getCurrentPosition()) >= rightTarget) {
-                    rightMotor.setPower(0);
-                } else {
-                    rightMotor.setPower(rightSpeed);
-                }
+//                if (Math.abs(leftMotor.getCurrentPosition()) >= leftTarget) {
+//                    leftMotor.setPower(0);
+//                } else {
+//                    leftMotor.setPower(leftSpeed);
+//                }
+//                if (Math.abs(rightMotor.getCurrentPosition()) >= rightTarget) {
+//                    rightMotor.setPower(0);
+//                } else {
+//                    rightMotor.setPower(rightSpeed);
+//                }
 
                 // Display it for the driver.
                 telemetry.addData("Path1",  "Running to %7d :%7d", leftTarget,  rightTarget);

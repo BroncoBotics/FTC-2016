@@ -35,6 +35,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.AnalogInput;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -65,11 +66,16 @@ public class Teleop extends OpMode
     // private DcMotor leftMotor = null;
     // private DcMotor rightMotor = null;
 
-    AnalogInput limitSwitch;
+//   AnalogInput limitSwitchOut, limitSwitchIn;
 
     Drivetrain drive;
-    private DcMotor lifts, sucker;
-    boolean slowMode = false, hasDriveCheckRunOnce = false, suckerOn = false, hasSuckerCheckRunOnce = false;
+    private DcMotor lifts, sucker, lShoot, rShoot;
+    boolean slowMode = false, hasDriveCheckRunOnce = false,
+            suckerOn = false, hasSuckerCheckRunOnce = false,
+            stopperOn = false, hasStopperstopedthestop = false,
+            flywheelsOn = false, haveFlyWheels = false;
+
+    Servo stopper;
     //lifts - x up, a down
 
     /*
@@ -79,11 +85,20 @@ public class Teleop extends OpMode
     public void init() {
         drive = new Drivetrain(hardwareMap.dcMotor.get("left motor"), hardwareMap.dcMotor.get("right motor"));
 
-        limitSwitch = hardwareMap.analogInput.get("limitSwitch");
+//        limitSwitchOut = hardwareMap.analogInput.get("limitSwitchout");
+//        limitSwitchIn = hardwareMap.analogInput.get("limitSwitchin");
 
         //motors
         lifts = hardwareMap.dcMotor.get("lifts");
         sucker = hardwareMap.dcMotor.get("sucker");
+       // zipper = hardwareMap.dcMotor.get("zipper");
+
+        lShoot = hardwareMap.dcMotor.get("lshoot");
+        rShoot = hardwareMap.dcMotor.get("rshoot");
+        rShoot.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        stopper = hardwareMap.servo.get("stopper");
+
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
@@ -134,12 +149,37 @@ public class Teleop extends OpMode
             hasSuckerCheckRunOnce = false;
 
         sucker.setPower((suckerOn) ? 1.0 : 0.0);
+      //  zipper.setPower((suckerOn) ? 1.0 : 0.0);
 
-        if (!limitSwitched()) {
-            lifts.setPower(gamepad1.right_trigger - gamepad1.left_trigger);
-        } else {
-            lifts.setPower(0);
+        // Flywheels Control
+        if (gamepad1.b && !haveFlyWheels) {
+            flywheelsOn = !flywheelsOn;
+            haveFlyWheels = true;
         }
+        if (!gamepad1.b)
+            haveFlyWheels = false;
+
+        lShoot.setPower((flywheelsOn) ? 0.95 : 0.0);
+        rShoot.setPower((flywheelsOn) ? 0.95 : 0.0);
+
+//        if (!limitSwitched("Out") && !limitSwitched("In")) {
+            lifts.setPower(gamepad1.right_trigger - gamepad1.left_trigger);
+//        } else {
+//            lifts.setPower(0);
+//        }
+//        }
+
+
+        //stopper code
+        if (gamepad1.y && !hasStopperstopedthestop) {
+            stopperOn = !stopperOn;
+            hasStopperstopedthestop = true;
+        }
+        if (!gamepad1.y)
+            hasStopperstopedthestop = false;
+
+        stopper.setPosition((stopperOn) ? 0.5 : 0.0);
+
     }
 
     /*
@@ -152,8 +192,14 @@ public class Teleop extends OpMode
         lifts.setPower(0);
     }
 
-    private Boolean limitSwitched(){
-        return limitSwitch.getVoltage() > (.1 * limitSwitch.getMaxVoltage());
-    }
+//   private Boolean limitSwitched(String inout){
+//       if(inout.equals("Out"))
+//       return limitSwitchOut.getVoltage() > (.1 * limitSwitchOut.getMaxVoltage());
+//
+//       if(inout.equals("In"))
+//       return limitSwitchIn.getVoltage() > (.1 * limitSwitchIn.getMaxVoltage());
+//
+//       return true;
+//   }
 
 }
