@@ -10,7 +10,7 @@ import org.firstinspires.ftc.teamcode.codelib.AutonomousOpMode;
 @Autonomous(name="Autonomous Mode #1", group="Auto")
 public class MyFirstAuto extends AutonomousOpMode {
 
-    static double     DRIVE_SPEED             = 0.3;
+    static double     DRIVE_SPEED             = 0.35;
     static double     TURN_SPEED              = 0.5;
 
     @Override
@@ -23,12 +23,13 @@ public class MyFirstAuto extends AutonomousOpMode {
         // Step through each leg of the path,
         // Note: Reverse movement is obtained by setting a negative distance (not speed)
         encoderDriveStraight(DRIVE_SPEED, 15, 5.0);  // S1: Forward 47 Inches with 5 Sec timeout
-        encoderTurn(TURN_SPEED, 42, 5.0);  // S2: Turn Right 12 Inches with 4 Sec timeout
-//        encoderDriveStraight(DRIVE_SPEED, 40, 5.0);
-//        driveToLine(0.3, 5);
-//        followLine(0.4, 4, Turn.RIGHT_FAVORING, 20);
-//        encoderTurn(TURN_SPEED, 4, 5.0);
-//        Color color = identifyColor();
+        encoderTurn(TURN_SPEED, 55, 5.0);  // S2: Turn Right 12 Inches with 4 Sec timeout
+        encoderDriveStraight(DRIVE_SPEED, 40, 5.0);
+        driveToLine(0.3, 5);
+        followLine(0.4, 4, Turn.RIGHT_FAVORING, 20);
+        encoderTurn(TURN_SPEED, 4, 5.0);
+        Color color = identifyColor();
+
 
 //        String colorString;
 //
