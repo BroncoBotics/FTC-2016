@@ -164,23 +164,23 @@ public class AutonomousOpMode extends LinearOpMode {
 
 
 
-//                if (Math.abs(leftMotor.getCurrentPosition()) >= leftTarget) {
-//                    leftMotor.setPower(0);
-//                } else {
-//                    leftMotor.setPower(leftSpeed);
-//                }
-//                if (Math.abs(rightMotor.getCurrentPosition()) >= rightTarget) {
-//                    rightMotor.setPower(0);
-//                } else {
-//                    rightMotor.setPower(rightSpeed);
-//                }
+                if (Math.abs(leftMotor.getCurrentPosition()) >= leftTarget) {
+                    leftMotor.setPower(0);
+                } else {
+                    leftMotor.setPower(leftSpeed);
+                }
+                if (Math.abs(rightMotor.getCurrentPosition()) >= rightTarget) {
+                    rightMotor.setPower(0);
+                } else {
+                    rightMotor.setPower(rightSpeed);
+                }
 
                 // Display it for the driver.
-                telemetry.addData("Path1",  "Running to %7d :%7d", leftTarget,  rightTarget);
-                telemetry.addData("Path2",  "Running at %7d :%7d",
-                        (Math.abs(leftMotor.getCurrentPosition())),
-                        (Math.abs(rightMotor.getCurrentPosition())));
-                telemetry.update();
+               // telemetry.addData("Path1",  "Running to %7d :%7d", leftTarget,  rightTarget);
+               // telemetry.addData("Path2",  "Running at %7d :%7d",
+               //         (Math.abs(leftMotor.getCurrentPosition())),
+//                        (Math.abs(rightMotor.getCurrentPosition())));
+//                telemetry.update();
 
 //                // Allow time for other processes to run.
 //                idle();
@@ -213,6 +213,7 @@ public class AutonomousOpMode extends LinearOpMode {
 
         double WHITE_THRESHOLD         = 0.25;
 
+
         runtime.reset();
 
         while ((lightSensor.getLightDetected() < WHITE_THRESHOLD) && runtime.seconds() < timeoutS) {
@@ -221,8 +222,8 @@ public class AutonomousOpMode extends LinearOpMode {
             leftMotor.setPower(speed);
             rightMotor.setPower(speed);
 
-            telemetry.addData("Light Level", lightSensor.getLightDetected());
-            telemetry.update();
+           // telemetry.addData("Light Level", lightSensor.getLightDetected());
+            //telemetry.update();
 
             idle();
         }

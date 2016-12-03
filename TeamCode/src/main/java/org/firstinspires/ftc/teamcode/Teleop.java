@@ -76,6 +76,7 @@ public class Teleop extends OpMode
             flywheelsOn = false, haveFlyWheels = false;
 
     Servo stopper;
+
     //lifts - x up, a down
 
     /*
@@ -128,18 +129,20 @@ public class Teleop extends OpMode
         telemetry.addData("Status", "Running: " + runtime.toString());
 
         // Drivetrain Control
-        if (gamepad1.a && !hasDriveCheckRunOnce) {
-            slowMode = !slowMode;
-            hasDriveCheckRunOnce = true;
-        }
-        if (!gamepad1.a)
-            hasDriveCheckRunOnce = false;
-        if (slowMode) {
-            drive.arcadeDrive(-gamepad1.left_stick_y * (float)0.25, -gamepad1.right_stick_x, true);
-        } else {
-            drive.arcadeDrive(gamepad1.left_stick_y, gamepad1.right_stick_x, true);
-        }
+//        if (gamepad1.a && !hasDriveCheckRunOnce) {
+//            slowMode = !slowMode;
+//            hasDriveCheckRunOnce = true;
+//        }
+//        if (!gamepad1.a)
+//            hasDriveCheckRunOnce = false;
+//        if (slowMode) {
+//            drive.arcadeDrive(-gamepad1.left_stick_y * (float)0.25, -gamepad1.right_stick_x, true);
+//        } else {
+//            drive.arcadeDrive(gamepad1.left_stick_y, gamepad1.right_stick_x, true);
+//        }
 
+
+        drive.setPower(gamepad1.left_stick_y,gamepad1.right_stick_y);
         // Sucker Control
         if (gamepad1.x && !hasSuckerCheckRunOnce) {
             suckerOn = !suckerOn;

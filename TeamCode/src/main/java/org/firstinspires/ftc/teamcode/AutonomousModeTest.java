@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 import org.firstinspires.ftc.teamcode.codelib.AutonomousOpMode;
 
@@ -8,7 +9,7 @@ import org.firstinspires.ftc.teamcode.codelib.AutonomousOpMode;
  * Created by JackV on 9/27/16.
  */
 
-
+@Disabled
 @Autonomous(name="Autonomous Mode Test", group="Auto")
 public class AutonomousModeTest extends AutonomousOpMode {
 
@@ -23,14 +24,9 @@ public class AutonomousModeTest extends AutonomousOpMode {
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
 
+//        encoderDriveStraight(.5 ,10, 20.0);
+        encoderTurn(1.0,90, 20);
 
-
-        // Step through each leg of the path,
-        // Note: Reverse movement is obtained by setting a negative distance (not speed)
-        // S1: Forward 47 Inches with 5 Sec timeout
-       // encoderTurn(1, 90, 5.0);  // S2: Turn Right 12 Inches with 4 Sec timeout
-//        encoder(DRIVE_SPEED, -24, -24, 4.0);  // S3: Reverse 24 Inches with 4 Sec timeout
-//
         telemetry.addData("Path", "Complete");
         telemetry.update();
     }
