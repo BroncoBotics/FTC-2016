@@ -37,6 +37,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.LightSensor;
 import com.qualcomm.robotcore.hardware.OpticalDistanceSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -83,7 +84,7 @@ public class AutonomousOpMode extends LinearOpMode {
                                                       (WHEEL_DIAMETER_INCHES * 3.1415);
 
 
-    DcMotor leftMotor, rightMotor;
+    DcMotor leftMotor, rightMotor, lshoot, rshoot, zipper;
 
     OpticalDistanceSensor lightSensor;
     ModernRoboticsI2cRangeSensor rangeSensor;
@@ -102,6 +103,10 @@ public class AutonomousOpMode extends LinearOpMode {
         colorSensor = hardwareMap.colorSensor.get("colorsensor");
         colorSensor.enableLed(false);
 
+        lshoot = hardwareMap.dcMotor.get("lshoot");
+        rshoot = hardwareMap.dcMotor.get("rshoot");
+        rshoot.setDirection(DcMotorSimple.Direction.REVERSE);
+        zipper = hardwareMap.dcMotor.get("sucker");
 
 
         leftMotor = hardwareMap.dcMotor.get("left motor");
@@ -131,6 +136,22 @@ public class AutonomousOpMode extends LinearOpMode {
      *  2) Move runs out of time
      *  3) Driver stops the opmode running.
      */
+
+    public void shootOn() {
+        lshoot.setPower(1);
+        rshoot.setPower(1);
+        zipper.setPower(1);
+    }
+
+    public void shootOff() {
+        lshoot.setPower(0);
+        rshoot.setPower(0);
+        zipper.setPower(0);
+    }
+    public void baseDrive(double power, int time){
+        leftMotor.setPower(power);
+    }
+
     public void encoder(double leftSpeed, double rightSpeed,
                         double leftInches, double rightInches,
                         double timeoutS) {

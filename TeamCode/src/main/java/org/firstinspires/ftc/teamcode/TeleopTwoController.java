@@ -34,12 +34,10 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.AnalogInput;
-import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.Gamepad;
+import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.codelib.Drivetrain;
 
@@ -57,8 +55,8 @@ import org.firstinspires.ftc.teamcode.codelib.Drivetrain;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="Teleop Main", group="Teleop")  // @Autonomous(...) is the other common choice
-public class Teleop extends OpMode
+@TeleOp(name="Teleop Two Controller", group="Teleop")  // @Autonomous(...) is the other common choice
+public class TeleopTwoController extends OpMode
 {
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
@@ -69,7 +67,7 @@ public class Teleop extends OpMode
 //   AnalogInput limitSwitchOut, limitSwitchIn;
 
     Drivetrain drive;
-    private DcMotor lifts, sucker, lShoot, rShoot, zipper;
+    private DcMotor lifts, suckerRight, suckerLeft, lShoot, rShoot, zipper;
     boolean slowMode = false, hasDriveCheckRunOnce = false,
             suckerOn = false, hasSuckerCheckRunOnce = false,
             stopperOn = false, hasStopperStopped = false,
@@ -92,8 +90,10 @@ public class Teleop extends OpMode
 
         //motors
         lifts = hardwareMap.dcMotor.get("lifts");
-        sucker = hardwareMap.dcMotor.get("sucker");
-        zipper = hardwareMap.dcMotor.get("collector");
+        suckerRight = hardwareMap.dcMotor.get("collectorRight");
+        suckerRight.setDirection(DcMotorSimple.Direction.REVERSE);
+        suckerLeft = hardwareMap.dcMotor.get("collectorLeft");
+        zipper = hardwareMap.dcMotor.get("sucker");
 
         lShoot = hardwareMap.dcMotor.get("lshoot");
         rShoot = hardwareMap.dcMotor.get("rshoot");
@@ -153,22 +153,23 @@ public class Teleop extends OpMode
         if (!gamepad1.x)
             hasSuckerCheckRunOnce = false;
 
-        sucker.setPower((suckerOn) ? 1.0 : 0.0);
+        suckerRight.setPower((suckerOn) ? 1.0 : 0.0);
+        suckerLeft.setPower((suckerOn) ? 1.0 : 0.0);
         zipper.setPower((suckerOn) ? 1.0 : 0.0);
 
         // Flywheels Control
-        if (gamepad1.b && !haveFlyWheels) {
+        if (gamepad2.b && !haveFlyWheels) {
             flywheelsOn = !flywheelsOn;
             haveFlyWheels = true;
         }
-        if (!gamepad1.b)
+        if (!gamepad2.b)
             haveFlyWheels = false;
 
         lShoot.setPower((flywheelsOn) ? 0.95 : 0.0);
         rShoot.setPower((flywheelsOn) ? 0.95 : 0.0);
 
 //        if (!limitSwitched("Out") && !limitSwitched("In")) {
-            lifts.setPower(gamepad1.right_trigger - gamepad1.left_trigger);
+            lifts.setPower(gamepad2.right_trigger - gamepad2.left_trigger);
 //        } else {
 //            lifts.setPower(0);
 //        }
@@ -176,30 +177,30 @@ public class Teleop extends OpMode
 
 
         //stopper code
-        if (gamepad1.y && !hasStopperStopped) {
+        if (gamepad2.y && !hasStopperStopped) {
             stopperOn = !stopperOn;
             hasStopperStopped = true;
         }
-        if (!gamepad1.y)
+        if (!gamepad2.y)
             hasStopperStopped = false;
 
-        if (gamepad1.dpad_right && !hasRightServoStopped) {
+        if (gamepad2.dpad_right && !hasRightServoStopped) {
             rightServoOn = !rightServoOn;
             hasRightServoStopped = true;
         }
-        if (!gamepad1.dpad_right)
+        if (!gamepad2.dpad_right)
             hasRightServoStopped = false;
 
-        if (gamepad1.dpad_left && !hasLeftServoStopped) {
+        if (gamepad2.dpad_left && !hasLeftServoStopped) {
             leftServoOn = !leftServoOn;
             hasLeftServoStopped = true;
         }
-        if (!gamepad1.dpad_left)
+        if (!gamepad2.dpad_left)
             hasLeftServoStopped = false;
 
-        stopper.setPosition((stopperOn) ? 0.5 : 0.0);
-        leftServo.setPosition((leftServoOn) ? 0.5 : 0.0);
-        rightServo.setPosition((rightServoOn) ? 0.5 : 0.0);
+        stopper.setPosition((stopperOn) ? .9 : 0.0);
+        leftServo.setPosition((leftServoOn) ? 1 : 0.0);
+        rightServo.setPosition((rightServoOn) ? 1 : 0.0);
 
     }
 
@@ -209,7 +210,8 @@ public class Teleop extends OpMode
     @Override
     public void stop() {
         drive.stop();
-        sucker.setPower(0);
+        suckerLeft.setPower(0);
+        suckerRight.setPower(0);
         lifts.setPower(0);
     }
 

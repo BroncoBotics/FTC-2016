@@ -16,8 +16,8 @@ public class Drivetrain {
         this.right_motor = right_motor;
         this.left_motor.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
         this.right_motor.setDirection(DcMotor.Direction.REVERSE);
-        this.left_motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        this.right_motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        this.left_motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        this.right_motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
     public int[] getPosition(){
