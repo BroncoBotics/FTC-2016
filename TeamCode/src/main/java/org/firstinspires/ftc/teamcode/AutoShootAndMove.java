@@ -27,6 +27,7 @@ public class AutoShootAndMove extends AutonomousOpMode{
         sleep(4000);
         shootOff();
         sleep(2000);
+
         encoderDriveStraight(DRIVE_SPEED, 40, 5.0);
 //        followLine(0.4, 4, Turn.RIGHT_FAVORING, 20);
 //        encoderTurn(TURN_SPEED, 4, 5.0);
