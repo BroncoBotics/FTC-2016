@@ -7,7 +7,7 @@ import org.firstinspires.ftc.teamcode.codelib.AutonomousOpMode;
 /**
  * Created by JackV on 10/7/16.
  */
-@Autonomous(name="Autonomous Shoot and Move", group="Auto")
+@Autonomous(name="Center Position Shoot then Hit Ball", group="Auto")
 public class AutoShootAndMove extends AutonomousOpMode{
 
     static double     DRIVE_SPEED             = 0.35;

@@ -37,6 +37,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.LightSensor;
 import com.qualcomm.robotcore.hardware.OpticalDistanceSensor;
@@ -84,11 +85,16 @@ public class AutonomousOpMode extends LinearOpMode {
                                                       (WHEEL_DIAMETER_INCHES * 3.1415);
 
 
-    DcMotor leftMotor, rightMotor, lshoot, rshoot, zipper;
+    DcMotor leftMotor, rightMotor, lshoot, rshoot, slides;
 
-    OpticalDistanceSensor lightSensor;
-    ModernRoboticsI2cRangeSensor rangeSensor;
-    ColorSensor colorSensor;
+    Servo buttonPush;
+
+
+
+
+//    OpticalDistanceSensor lightSensor;
+//    ModernRoboticsI2cRangeSensor rangeSensor;
+//    ColorSensor colorSensor;
 
 
 
@@ -97,16 +103,16 @@ public class AutonomousOpMode extends LinearOpMode {
     public void runOpMode() {}
 
     public void hardwareInit() {
-        rangeSensor = hardwareMap.get(ModernRoboticsI2cRangeSensor.class, "rangesensor");
-        lightSensor = hardwareMap.opticalDistanceSensor.get("opticaldistance");
-
-        colorSensor = hardwareMap.colorSensor.get("colorsensor");
-        colorSensor.enableLed(false);
+//        rangeSensor = hardwareMap.get(ModernRoboticsI2cRangeSensor.class, "rangesensor");
+//        lightSensor = hardwareMap.opticalDistanceSensor.get("opticaldistance");
+//
+//        colorSensor = hardwareMap.colorSensor.get("colorsensor");
+//        colorSensor.enableLed(false);
 
         lshoot = hardwareMap.dcMotor.get("lshoot");
+        slides = hardwareMap.dcMotor.get("slides");
         rshoot = hardwareMap.dcMotor.get("rshoot");
         rshoot.setDirection(DcMotorSimple.Direction.REVERSE);
-        zipper = hardwareMap.dcMotor.get("sucker");
 
 
         leftMotor = hardwareMap.dcMotor.get("left motor");
@@ -120,6 +126,8 @@ public class AutonomousOpMode extends LinearOpMode {
 
         leftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         rightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        buttonPush = hardwareMap.servo.get("lservo");
 
         // Send telemetry message to indicate successful Encoder reset
         telemetry.addData("Path0",  "Starting at %7d :%7d",
@@ -140,13 +148,13 @@ public class AutonomousOpMode extends LinearOpMode {
     public void shootOn() {
         lshoot.setPower(1);
         rshoot.setPower(1);
-        zipper.setPower(1);
+        slides.setPower(1);
     }
 
     public void shootOff() {
         lshoot.setPower(0);
         rshoot.setPower(0);
-        zipper.setPower(0);
+        slides.setPower(0);
     }
     public void baseDrive(double power, int time){
         leftMotor.setPower(power);
@@ -197,11 +205,11 @@ public class AutonomousOpMode extends LinearOpMode {
                 }
 
                 // Display it for the driver.
-               // telemetry.addData("Path1",  "Running to %7d :%7d", leftTarget,  rightTarget);
-               // telemetry.addData("Path2",  "Running at %7d :%7d",
-               //         (Math.abs(leftMotor.getCurrentPosition())),
-//                        (Math.abs(rightMotor.getCurrentPosition())));
-//                telemetry.update();
+               telemetry.addData("Path1",  "Running to %7d :%7d", leftTarget,  rightTarget);
+                telemetry.addData("Path2",  "Running at %7d :%7d",
+                        (Math.abs(leftMotor.getCurrentPosition())),
+                        (Math.abs(rightMotor.getCurrentPosition())));
+                telemetry.update();
 
 //                // Allow time for other processes to run.
 //                idle();
@@ -230,81 +238,84 @@ public class AutonomousOpMode extends LinearOpMode {
         encoder(leftSpeed, rightSpeed, distance, distance, timeoutS);
     }
 
-    public void driveToLine(double speed, double timeoutS) {
+//    public void driveToLine(double speed, double timeoutS) {
+//
+//        double WHITE_THRESHOLD         = 0.25;
+//
+//
+//        runtime.reset();
+//
+//        while ((lightSensor.getLightDetected() < WHITE_THRESHOLD) && runtime.seconds() < timeoutS) {
+//
+//            // Start the robot moving forward, and then begin looking for a white line.
+//            leftMotor.setPower(speed);
+//            rightMotor.setPower(speed);
+//
+//           // telemetry.addData("Light Level", lightSensor.getLightDetected());
+//            //telemetry.update();
+//
+//            idle();
+//        }
+//
+//        leftMotor.setPower(0);
+//        rightMotor.setPower(0);
+//
+//
+//        lightSensor.enableLed(false);
+//    }
 
-        double WHITE_THRESHOLD         = 0.25;
 
 
-        runtime.reset();
-
-        while ((lightSensor.getLightDetected() < WHITE_THRESHOLD) && runtime.seconds() < timeoutS) {
-
-            // Start the robot moving forward, and then begin looking for a white line.
-            leftMotor.setPower(speed);
-            rightMotor.setPower(speed);
-
-           // telemetry.addData("Light Level", lightSensor.getLightDetected());
-            //telemetry.update();
-
-            idle();
-        }
-
-        leftMotor.setPower(0);
-        rightMotor.setPower(0);
-
-
-        lightSensor.enableLed(false);
-    }
 
     public enum Turn {
         RIGHT_FAVORING, LEFT_FAVORING
     }
 
-    public void followLine(double base_speed, double distanceInch, Turn turn_favorite, double timeoutS) {
-
-        double     HEADING_CORRECTION_SPEED         = 0.4;
-        double     WHITE_THRESHOLD                  = 0.25;
-
-        // turn on LED of light sensor.
-        lightSensor.enableLed(true);
-
-        runtime.reset();
-
-
-        while (rangeSensor.getDistance(DistanceUnit.INCH) > distanceInch && runtime.seconds() < timeoutS) {
-
-            double light_intensity = lightSensor.getLightDetected();
-            telemetry.addData("Light Level", light_intensity);
-            telemetry.update();
-
-            if (turn_favorite == Turn.LEFT_FAVORING) {
-                HEADING_CORRECTION_SPEED = -HEADING_CORRECTION_SPEED;
-            }
-
-
-            if (light_intensity > WHITE_THRESHOLD) {
-                //Sees white line
-                leftMotor.setPower(base_speed);
-                rightMotor.setPower(base_speed);
-                encoderDriveStraight(.3, 2, 3);
-            } else  {
-                //Sees black tile
-                leftMotor.setPower(HEADING_CORRECTION_SPEED);
-                rightMotor.setPower(-HEADING_CORRECTION_SPEED);
-            }
-
-            telemetry.addData("RightMotor", rightMotor.getPower());
-            telemetry.addData("LeftMotor", leftMotor.getPower());
-            telemetry.update();
-
-            idle();
-        }
-
-
-        leftMotor.setPower(0);
-        rightMotor.setPower(0);
-
-    }
+//    public void followLine(double base_speed, double distanceInch, Turn turn_favorite, double timeoutS) {
+//
+//        double     HEADING_CORRECTION_SPEED         = 0.4;
+//        double     WHITE_THRESHOLD                  = 0.25;
+//
+//        // turn on LED of light sensor.
+//        lightSensor.enableLed(true);
+//
+//        runtime.reset();
+//
+//
+//        while (rangeSensor.getDistance(DistanceUnit.INCH) > distanceInch && runtime.seconds() < timeoutS) {
+//
+//            double light_intensity = lightSensor.getLightDetected();
+//            telemetry.addData("Light Level", light_intensity);
+//            telemetry.update();
+//
+//            if (turn_favorite == Turn.LEFT_FAVORING) {
+//                HEADING_CORRECTION_SPEED = -HEADING_CORRECTION_SPEED;
+//            }
+//
+//
+//            if (light_intensity > WHITE_THRESHOLD) {
+//                //Sees white line
+//                leftMotor.setPower(base_speed);
+//                rightMotor.setPower(base_speed);
+//                encoderDriveStraight(.3, 2, 3);
+//            } else  {
+//                //Sees black tile
+//                leftMotor.setPower(HEADING_CORRECTION_SPEED);
+//                rightMotor.setPower(-HEADING_CORRECTION_SPEED);
+//            }
+//
+//            telemetry.addData("RightMotor", rightMotor.getPower());
+//            telemetry.addData("LeftMotor", leftMotor.getPower());
+//            telemetry.update();
+//
+//            idle();
+//        }
+//
+//
+//        leftMotor.setPower(0);
+//        rightMotor.setPower(0);
+//
+//    }
 
 
 
@@ -312,11 +323,11 @@ public class AutonomousOpMode extends LinearOpMode {
         RED, BLUE
     }
 
-    public Color identifyColor() {
-
-        if (colorSensor.blue() > colorSensor.red())
-            return Color.BLUE;
-        else
-            return Color.RED;
-    }
+//    public Color identifyColor(Color teamColor) {
+//
+//        if (colorSensor.blue() > colorSensor.red())
+//            return Color.BLUE;
+//        else
+//            return Color.RED;
+//    }
 }

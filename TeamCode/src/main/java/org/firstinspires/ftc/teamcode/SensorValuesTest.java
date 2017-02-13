@@ -35,6 +35,7 @@ package org.firstinspires.ftc.teamcode;
 import android.graphics.Color;
 
 import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cRangeSensor;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.ColorSensor;
@@ -64,7 +65,6 @@ import org.firstinspires.ftc.teamcode.codelib.Drivetrain;
  */
 
 @TeleOp(name="Sensor Value Test", group="Test")  // @Autonomous(...) is the other common choice
-
 public class SensorValuesTest extends OpMode
 {
     /* Declare OpMode members. */

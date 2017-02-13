@@ -1,13 +1,14 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 import org.firstinspires.ftc.teamcode.codelib.AutonomousOpMode;
 
 /**
  * Created by JackV on 10/7/16.
  */
-@Autonomous(name="Autonomous Mode Shoot", group="Auto")
+@Autonomous(name="Center Position Shoot", group="Auto")
 public class AutoShoot extends AutonomousOpMode{
 
     static double     DRIVE_SPEED             = 0.35;

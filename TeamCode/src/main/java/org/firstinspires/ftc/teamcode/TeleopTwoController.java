@@ -41,21 +41,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.codelib.Drivetrain;
 
-/**
- * This file contains an example of an iterative (Non-Linear) "OpMode".
- * An OpMode is a 'program' that runs in either the autonomous or the teleop period of an FTC match.
- * The names of OpModes appear on the menu of the FTC Driver Station.
- * When an selection is made from the menu, the corresponding OpMode
- * class is instantiated on the Robot Controller and executed.
- *
- * This particular OpMode just executes a basic Tank Drive Teleop for a PushBot
- * It includes all the skeletal structure that all iterative OpModes contain.
- *
- * Use Android Studios to Copy this Class, and Paste it into your team's code folder with a new name.
- * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
- */
-
-@TeleOp(name="Teleop Two Controller", group="Teleop")  // @Autonomous(...) is the other common choice
+@TeleOp(name="Two Drivers", group="Teleop")  // @Autonomous(...) is the other common choice
 public class TeleopTwoController extends OpMode
 {
     /* Declare OpMode members. */
@@ -67,20 +53,15 @@ public class TeleopTwoController extends OpMode
 //   AnalogInput limitSwitchOut, limitSwitchIn;
 
     Drivetrain drive;
-    private DcMotor lifts, suckerRight, suckerLeft, lShoot, rShoot, zipper;
+    private DcMotor lifts, suckerRight, suckerLeft, lShoot, rShoot, slides;
     boolean slowMode = false, hasDriveCheckRunOnce = false,
             suckerOn = false, hasSuckerCheckRunOnce = false,
-            stopperOn = false, hasStopperStopped = false,
-            leftServoOn = false, hasLeftServoStopped = false,
-            rightServoOn = false, hasRightServoStopped = false,
             flywheelsOn = false, haveFlyWheels = false;
 
-    Servo stopper, leftServo, rightServo;
-    //lifts - x up, a down
+    boolean liftsOn = false,setLifts = false;
 
-    /*
-     * Code to run ONCE when the driver hits INIT
-     */
+    Servo buttonPush;
+
     @Override
     public void init() {
         drive = new Drivetrain(hardwareMap.dcMotor.get("left motor"), hardwareMap.dcMotor.get("right motor"));
@@ -89,36 +70,29 @@ public class TeleopTwoController extends OpMode
 //        limitSwitchIn = hardwareMap.analogInput.get("limitSwitchin");
 
         //motors
-        lifts = hardwareMap.dcMotor.get("lifts");
-        suckerRight = hardwareMap.dcMotor.get("collectorRight");
-        suckerRight.setDirection(DcMotorSimple.Direction.REVERSE);
-        suckerLeft = hardwareMap.dcMotor.get("collectorLeft");
-        zipper = hardwareMap.dcMotor.get("sucker");
+//        lifts = hardwareMap.dcMotor.get("slides");
+//        suckerRight = hardwareMap.dcMotor.get("collectorRight");
+//        suckerRight.setDirection(DcMotorSimple.Direction.REVERSE);
+//        suckerLeft = hardwareMap.dcMotor.get("collectorLeft");
+        slides = hardwareMap.dcMotor.get("lifts");
 
         lShoot = hardwareMap.dcMotor.get("lshoot");
-        rShoot = hardwareMap.dcMotor.get("rshoot");
+//        rShoot = hardwareMap.dcMotor.get("rshoot");
         rShoot.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        stopper = hardwareMap.servo.get("stopper");
-        leftServo = hardwareMap.servo.get("lservo");
-        rightServo = hardwareMap.servo.get("rservo");
+        buttonPush = hardwareMap.servo.get("lservo");
+
 
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
     }
 
-    /*
-     * Code to run REPEATEDLY after the driver hits INIT, but before they hit PLAY
-     */
     @Override
     public void init_loop() {
 
     }
 
-    /*
-     * Code to run ONCE when the driver hits PLAY
-     */
     @Override
     public void start() {
         runtime.reset();
@@ -140,22 +114,33 @@ public class TeleopTwoController extends OpMode
             hasDriveCheckRunOnce = false;
 
         if (slowMode) {
-            drive.arcadeDrive(-gamepad1.left_stick_y * (float).25, gamepad1.right_stick_x * (float).35, false);
+            drive.arcadeDrive(-gamepad1.left_stick_y * (float).25, gamepad1.right_stick_x * (float).6, false);
         } else {
             drive.arcadeDrive(gamepad1.left_stick_y, gamepad1.right_stick_x, true);
         }
 
         // Sucker Control
-        if (gamepad1.x && !hasSuckerCheckRunOnce) {
+        if (gamepad2.x && !hasSuckerCheckRunOnce) {
             suckerOn = !suckerOn;
             hasSuckerCheckRunOnce = true;
         }
-        if (!gamepad1.x)
+        if (!gamepad2.x)
             hasSuckerCheckRunOnce = false;
+
+
+
+        if(gamepad2.a && !liftsOn) {
+            setLifts = !setLifts;
+            liftsOn = true;
+        }
+        if(!gamepad2.a){
+            liftsOn = false;
+        }
 
         suckerRight.setPower((suckerOn) ? 1.0 : 0.0);
         suckerLeft.setPower((suckerOn) ? 1.0 : 0.0);
-        zipper.setPower((suckerOn) ? 1.0 : 0.0);
+
+        lifts.setPower((setLifts) ? 1.0 : 0.0);
 
         // Flywheels Control
         if (gamepad2.b && !haveFlyWheels) {
@@ -169,44 +154,27 @@ public class TeleopTwoController extends OpMode
         rShoot.setPower((flywheelsOn) ? 0.95 : 0.0);
 
 //        if (!limitSwitched("Out") && !limitSwitched("In")) {
-            lifts.setPower(gamepad2.right_trigger - gamepad2.left_trigger);
+//            lifts.setPower(gamepad2.right_trigger - gamepad2.left_trigger);
 //        } else {
 //            lifts.setPower(0);
 //        }
 //        }
 
 
-        //stopper code
-        if (gamepad2.y && !hasStopperStopped) {
-            stopperOn = !stopperOn;
-            hasStopperStopped = true;
+        if(gamepad2.right_bumper){
+            buttonPush.setPosition(0.4);
+        } else {
+            buttonPush.setPosition(0);
         }
-        if (!gamepad2.y)
-            hasStopperStopped = false;
 
-        if (gamepad2.dpad_right && !hasRightServoStopped) {
-            rightServoOn = !rightServoOn;
-            hasRightServoStopped = true;
+        if(gamepad2.left_stick_y > 0.1 || gamepad2.left_stick_y < -0.1){
+            slides.setPower(gamepad2.left_stick_y);
+        }else {
+            slides.setPower(0);
         }
-        if (!gamepad2.dpad_right)
-            hasRightServoStopped = false;
-
-        if (gamepad2.dpad_left && !hasLeftServoStopped) {
-            leftServoOn = !leftServoOn;
-            hasLeftServoStopped = true;
-        }
-        if (!gamepad2.dpad_left)
-            hasLeftServoStopped = false;
-
-        stopper.setPosition((stopperOn) ? .9 : 0.0);
-        leftServo.setPosition((leftServoOn) ? 1 : 0.0);
-        rightServo.setPosition((rightServoOn) ? 1 : 0.0);
 
     }
 
-    /*
-     * Code to run ONCE after the driver hits STOP
-     */
     @Override
     public void stop() {
         drive.stop();

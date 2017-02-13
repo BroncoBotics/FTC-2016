@@ -8,9 +8,8 @@ import org.firstinspires.ftc.teamcode.codelib.AutonomousOpMode;
 /**
  * Created by JackV on 10/7/16.
  */
-@Autonomous(name="Just shoot, move, and some other stuff", group="Auto")
-@Disabled
-public class MyFirstAuto extends AutonomousOpMode {
+@Autonomous(name="Corner Position Shoot", group="Auto")
+public class AutoShoot2 extends AutonomousOpMode{
 
     static double     DRIVE_SPEED             = 0.35;
     static double     TURN_SPEED              = 0.5;
@@ -22,29 +21,20 @@ public class MyFirstAuto extends AutonomousOpMode {
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
 
-        encoderDriveStraight(DRIVE_SPEED, 5, 5.0);  // S1: Forward 47 Inches with 5 Sec timeout
-        shootOn();
-        sleep(5000);
-        shootOff();
         // Step through each leg of the path,
         // Note: Reverse movement is obtained by setting a negative distance (not speed)
-        encoderDriveStraight(DRIVE_SPEED, 25, 3.0);  // S1: Forward 47 Inches with 5 Sec timeout
-        encoderTurn(TURN_SPEED, -20, 5.0);
-        encoderDriveStraight(DRIVE_SPEED, 40, 5.0);
-        encoderTurn(-TURN_SPEED, -50, 5.0);
-//        driveToLine(0.5, 5.0);
-
-
-
-
-
-//        driveToLine(0.3, 5);
+        // S1: Forward 47 Inches with 5 Sec timeout
+        sleep(3000);
+        shootOn();
+        sleep(7000);
+        shootOff();
 //        followLine(0.4, 4, Turn.RIGHT_FAVORING, 20);
-
-
 //        encoderTurn(TURN_SPEED, 4, 5.0);
 //        Color color = identifyColor();
+
+
 //        String colorString;
+//
 //
 //        if (color == Color.BLUE) {
 //            colorString = "Blue";
@@ -62,7 +52,7 @@ public class MyFirstAuto extends AutonomousOpMode {
 //        telemetry.addData("Color", colorString);
 //        telemetry.update();
 
-        sleep(4000);
+        sleep(3000);
     }
 
 

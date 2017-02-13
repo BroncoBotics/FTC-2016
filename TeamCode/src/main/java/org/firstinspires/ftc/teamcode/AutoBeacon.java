@@ -8,9 +8,8 @@ import org.firstinspires.ftc.teamcode.codelib.AutonomousOpMode;
 /**
  * Created by JackV on 10/7/16.
  */
-@Autonomous(name="Just shoot, move, and some other stuff", group="Auto")
-@Disabled
-public class MyFirstAuto extends AutonomousOpMode {
+@Autonomous(name="Just Beacon?", group="Auto")
+public class AutoBeacon extends AutonomousOpMode {
 
     static double     DRIVE_SPEED             = 0.35;
     static double     TURN_SPEED              = 0.5;
@@ -23,16 +22,19 @@ public class MyFirstAuto extends AutonomousOpMode {
         waitForStart();
 
         encoderDriveStraight(DRIVE_SPEED, 5, 5.0);  // S1: Forward 47 Inches with 5 Sec timeout
-        shootOn();
-        sleep(5000);
-        shootOff();
+//        shootOn();
+//        sleep(5000);
+//        shootOff();
         // Step through each leg of the path,
         // Note: Reverse movement is obtained by setting a negative distance (not speed)
-        encoderDriveStraight(DRIVE_SPEED, 25, 3.0);  // S1: Forward 47 Inches with 5 Sec timeout
-        encoderTurn(TURN_SPEED, -20, 5.0);
+       // encoderDriveStraight(DRIVE_SPEED, 25, 3.0);  // S1: Forward 47 Inches with 5 Sec timeout
+        encoderDriveStraight(DRIVE_SPEED, 15,5);
+        encoderTurn(TURN_SPEED, 35, 5.0);
         encoderDriveStraight(DRIVE_SPEED, 40, 5.0);
-        encoderTurn(-TURN_SPEED, -50, 5.0);
+        encoderTurn(TURN_SPEED, 45, 5.0);
 //        driveToLine(0.5, 5.0);
+
+
 
 
 

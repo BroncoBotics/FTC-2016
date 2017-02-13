@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 import org.firstinspires.ftc.teamcode.codelib.AutonomousOpMode;
 
@@ -10,6 +11,7 @@ import org.firstinspires.ftc.teamcode.codelib.AutonomousOpMode;
 
 
 @Autonomous(name="Autonomous Mode Test", group="Auto")
+@Disabled
 public class AutonomousModeTest extends AutonomousOpMode {
 
     static double     DRIVE_SPEED             = 0.3;
